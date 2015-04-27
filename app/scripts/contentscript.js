@@ -48,12 +48,12 @@ window.onload = function(){
   }
 
   function paintLinks(referenceArray) {
-    var referenceBodyArray = referenceArray.map(function(ref){ return ref.body; });
+    var referenceUrlArray = referenceArray.map(function(ref){ return ref.url; });
     var links = document.getElementsByTagName('a');
     var linkUrl;
     for ( var i=0; i<links.length; i++ ) {
       linkUrl = links[i].href.replace(/^[A-Za-z]{1,15}:\/\/[w]{0,3}\.?/, '').replace(/[#?](.*)$/,'').replace(/\/$/, '');
-      if ( referenceBodyArray.indexOf(linkUrl) > -1 ) {
+      if ( referenceUrlArray.indexOf(linkUrl) > -1 ) {
         paintLink(links[i]);
       }
     }

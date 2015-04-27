@@ -7,10 +7,6 @@
     return PromiseA.resolve('http://localhost:3000');
   }
 
-  // function cleanUrl(url) {
-  //   return PromiseA.resolve(  );
-  // }
-
   function payloadToQueryString(data) {
     return new PromiseA(function(resolve){
       var parts = [];

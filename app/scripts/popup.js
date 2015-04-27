@@ -79,7 +79,7 @@ $(function() {
       key: tabInfo.identityKey,
       violation: $('input[name="strike-violation"]:checked').val(),
       comment: $('#strike-comment').val(),
-      link: tabInfo.tab.url
+      url: tabInfo.tab.url
     };
 
     strikeLoading();
