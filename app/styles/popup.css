@@ -1,0 +1,69 @@
+.wrapper { width: 184px; }
+.option-link {
+  color: blue;
+  display: none;
+}
+.option-link:hover { cursor: pointer; }
+#strike-comment { width: 97%; }
+.strike-button {
+  width: 100%;
+  -webkit-border-radius: 3;
+  -moz-border-radius: 3;
+  border-radius: 3px;
+  font-family: Arial;
+  color: #ffffff;
+  font-size: 15px;
+  background: #3498db;
+  padding: 4px 20px;
+  text-decoration: none;
+  border: none;
+  outline: 0;
+}
+.strike-button:hover {
+  background: #3cb0fd;
+  text-decoration: none;
+}
+.inline-checkbox { margin: 5px 0; }
+
+.spinner {
+  display: none;
+  width: 40px;
+  height: 40px;
+
+  position: relative;
+  margin: 25px auto;
+}
+
+.double-bounce1, .double-bounce2 {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: #333;
+  opacity: 0.6;
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  -webkit-animation: bounce 2.0s infinite ease-in-out;
+  animation: bounce 2.0s infinite ease-in-out;
+}
+
+.double-bounce2 {
+  -webkit-animation-delay: -1.0s;
+  animation-delay: -1.0s;
+}
+
+@-webkit-keyframes bounce {
+  0%, 100% { -webkit-transform: scale(0.0) }
+  50% { -webkit-transform: scale(1.0) }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: scale(0.0);
+    -webkit-transform: scale(0.0);
+  } 50% {
+    transform: scale(1.0);
+    -webkit-transform: scale(1.0);
+  }
+}
