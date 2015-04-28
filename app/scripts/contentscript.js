@@ -1,7 +1,10 @@
 
 window.onload = function(){
   'use strict';
+  var $ = window.jQuery;
   var PromiseA = window.Promise;
+  var tooltipJS = new window.ToolTipJS();
+  tooltipJS.addLocationPreference(new tooltipJS.tooltipLocation(tooltipJS.LocationConstants.Top, 'tooltip-Top'));
 
   Array.prototype.getUnique = function(){
     var u = {}, a = [];
@@ -43,20 +46,83 @@ window.onload = function(){
     });
   }
 
-  function paintLink(elm) {
-    elm.className = elm.className + ' clickshame';
+  // function clickshameLoadingHtml() {
+  //   return '<div class="clickshame-spinner" id="strike-spinner">'+
+  //     '<div class="clickshame-double-bounce1"></div>'+
+  //     '<div class="clickshame-double-bounce2"></div>'+
+  //     '</div>';
+  // }
+
+  function bindTooltip(elm) {
+    return new PromiseA(function(){
+
+      var pageX = Math.floor( $(elm).offset().top );
+      var pageY = Math.floor( $(elm).offset().left );
+
+      console.log('blah1');
+      console.log(pageX);
+      console.log(pageY);
+
+      $(elm).hover(function(e){ // Hover event
+        console.log('blah2');
+        console.log(pageX);
+        console.log(pageY);
+
+        $('<div class="clickshame-tooltip"></div>')
+        .html('<div class="clickshame-spinner"'+
+        '<div class="clickshame-double-bounce1"></div>'+
+        '<div class="clickshame-double-bounce2"></div>'+
+        '</div>')
+        .appendTo('body')
+        .css('top', (pageX - 48) + 'px')
+        .css('left', (pageY) + 'px')
+        .fadeIn('slow');
+
+        chrome.runtime.sendMessage({func: 'getTabInfo'}, function(tabInfo) {
+          var message = {
+            func: 'sendRequest',
+            method: 'GET',
+            path: '/references',
+            data: {key: tabInfo.identityKey, url: elm.href.replace(/^[A-Za-z]{1,15}:\/\/[w]{0,3}\.?/, '').replace(/[#?](.*)$/,'').replace(/\/$/, '')}
+          };
+
+          chrome.runtime.sendMessage(message, function(response) {
+            $('.clickshame-tooltip').html('<div>Clickshame Score: '+response.score+'</div>');
+          });
+        });
+
+      }, function(){ // Hover off event
+
+        $('.clickshame-tooltip').remove();
+
+      });
+    });
   }
 
-  function paintLinks(referenceArray) {
-    var referenceUrlArray = referenceArray.map(function(ref){ return ref.url; });
-    var links = document.getElementsByTagName('a');
-    var linkUrl;
-    for ( var i=0; i<links.length; i++ ) {
-      linkUrl = links[i].href.replace(/^[A-Za-z]{1,15}:\/\/[w]{0,3}\.?/, '').replace(/[#?](.*)$/,'').replace(/\/$/, '');
-      if ( referenceUrlArray.indexOf(linkUrl) > -1 ) {
-        paintLink(links[i]);
+  function paintElement(elm) {
+    return new PromiseA(function(){
+      elm.className = elm.className + ' clickshame';
+      bindTooltip(elm);
+    });
+  }
+
+  function getUrlArrayFromResponse(response) {
+    return new PromiseA(function(resolve){
+      resolve( response.map(function(ref){ return ref.url; }) );
+    });
+  }
+
+  function paintElements(referenceUrlArray) {
+    return new PromiseA(function(){
+      var links = document.getElementsByTagName('a');
+      var linkUrl;
+      for ( var i=0; i<links.length; i++ ) {
+        linkUrl = links[i].href.replace(/^[A-Za-z]{1,15}:\/\/[w]{0,3}\.?/, '').replace(/[#?](.*)$/,'').replace(/\/$/, '');
+        if ( referenceUrlArray.indexOf(linkUrl) > -1 ) {
+          paintElement(links[i]);
+        }
       }
-    }
+    });
   }
 
   function submitCurrentReferences(tabInfo) {
@@ -70,7 +136,7 @@ window.onload = function(){
         };
 
         chrome.runtime.sendMessage(message, function(response) {
-          paintLinks(response);
+          getUrlArrayFromResponse(response).then(function(referenceUrlArray) { paintElements(referenceUrlArray); });
         });
       });
     });
@@ -89,6 +155,7 @@ window.onload = function(){
       }
     });
   });
+
 
 
 };
