@@ -77,7 +77,7 @@ $(function() {
   function sendStrike(tabInfo) {
     var strikeData = {
       key: tabInfo.identityKey,
-      violation: $('input[name="strike-violation"]:checked').val(),
+      type: $('input[name="strike-type"]:checked').val(),
       comment: $('#strike-comment').val(),
       url: tabInfo.tab.url
     };

@@ -3,8 +3,6 @@ window.onload = function(){
   'use strict';
   var $ = window.jQuery;
   var PromiseA = window.Promise;
-  var tooltipJS = new window.ToolTipJS();
-  tooltipJS.addLocationPreference(new tooltipJS.tooltipLocation(tooltipJS.LocationConstants.Top, 'tooltip-Top'));
 
   Array.prototype.getUnique = function(){
     var u = {}, a = [];
@@ -63,7 +61,7 @@ window.onload = function(){
       console.log(pageX);
       console.log(pageY);
 
-      $(elm).hover(function(e){ // Hover event
+      $(elm).hover(function(){ // Hover event
         console.log('blah2');
         console.log(pageX);
         console.log(pageY);
@@ -74,7 +72,7 @@ window.onload = function(){
         '<div class="clickshame-double-bounce2"></div>'+
         '</div>')
         .appendTo('body')
-        .css('top', (pageX - 48) + 'px')
+        .css('top', (pageX - 60) + 'px')
         .css('left', (pageY) + 'px')
         .fadeIn('slow');
 
@@ -87,7 +85,15 @@ window.onload = function(){
           };
 
           chrome.runtime.sendMessage(message, function(response) {
-            $('.clickshame-tooltip').html('<div>Clickshame Score: '+response.score+'</div>');
+            var tooltipHtml = '';
+            var scores = response.Scores;
+            console.log('blahman');
+            console.log(scores);
+            console.log(scores.length);
+            for ( var i=0; i<scores.length; i++ ) {
+              tooltipHtml += '<div>'+scores[i].type+': '+scores[i].value+'</div>';
+            }
+            $('.clickshame-tooltip').html(tooltipHtml);
           });
         });
 
