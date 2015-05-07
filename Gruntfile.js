@@ -111,7 +111,6 @@ module.exports = function (grunt) {
         reporter: require('jshint-stylish'),
         ignores: [
           'app/scripts/jquery-2.1.3.min.js',
-          'app/scripts/tooltip.js',
         ]
       },
       all: [
