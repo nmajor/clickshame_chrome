@@ -18,28 +18,29 @@ window.onload = function(){
 
   function fullUrlFromHref( href ) {
     if ( href.indexOf( '://' ) > -1 ) {
-      return href;
+      return href.replace(/^[A-Za-z]{1,15}:\/\/[w]{0,3}\.?/, '').replace(/[#?](.*)$/,'').replace(/\/$/, '');
     } else {
-      return document.domain+href;
+      return (document.domain+href).replace(/^[A-Za-z]{1,15}:\/\/[w]{0,3}\.?/, '').replace(/[#?](.*)$/,'').replace(/\/$/, '');
     }
   }
 
-  function getUrlsFromLinks(links) {
+  function getUrlHashesFromLinks(links) {
+    var CryptoJS = window.CryptoJS;
     return new PromiseA(function(resolve){
-      var urls = [];
+      var hashes = [];
       for(var i=0; i<links.length; i++) {
         if ( links[i].href === '' ) { continue; }
-        urls.push( fullUrlFromHref(links[i].href) );
+        hashes.push( CryptoJS.MD5(fullUrlFromHref(links[i].href)).toString() );
       }
-      resolve( urls.getUnique() );
+      resolve( hashes.getUnique() );
     });
   }
 
   function getCurrentReferences() {
     return new PromiseA(function(resolve){
       var links = document.getElementsByTagName('a');
-      getUrlsFromLinks(links).then(function(urls){
-        resolve( urls );
+      getUrlHashesFromLinks(links).then(function(hashes){
+        resolve( hashes );
       });
     });
   }
@@ -51,20 +52,29 @@ window.onload = function(){
   //     '</div>';
   // }
 
+  function clickshameTooltip(scores, comments) {
+    var html = '';
+    html += '<div class="clickshame-scores">';
+    for ( var i=0; i<scores.length; i++ ) {
+      html += '<div class="clickshame-score '+scores[i].type+'">'+scores[i].type+': '+scores[i].value+'</div>';
+    }
+    html += '</div>';
+    if ( comments.length > 0 ) {
+      html += '<div class="clickshame-comments">';
+      for ( var j=0; j<comments.length; j++ ) {
+        html += '<div class="clickshame-comment">'+comments[j].text+'</div>';
+      }
+    }
+    return html;
+  }
+
   function bindTooltip(elm) {
     return new PromiseA(function(){
 
       var pageX = Math.floor( $(elm).offset().top );
       var pageY = Math.floor( $(elm).offset().left );
 
-      console.log('blah1');
-      console.log(pageX);
-      console.log(pageY);
-
       $(elm).hover(function(){ // Hover event
-        console.log('blah2');
-        console.log(pageX);
-        console.log(pageY);
 
         $('<div class="clickshame-tooltip"></div>')
         .html('<div class="clickshame-spinner"'+
@@ -72,7 +82,7 @@ window.onload = function(){
         '<div class="clickshame-double-bounce2"></div>'+
         '</div>')
         .appendTo('body')
-        .css('top', (pageX - 60) + 'px')
+        .css('top', (pageX - 50) + 'px')
         .css('left', (pageY) + 'px')
         .fadeIn('slow');
 
@@ -80,20 +90,17 @@ window.onload = function(){
           var message = {
             func: 'sendRequest',
             method: 'GET',
-            path: '/references',
+            path: '/references/find',
             data: {key: tabInfo.identityKey, url: elm.href.replace(/^[A-Za-z]{1,15}:\/\/[w]{0,3}\.?/, '').replace(/[#?](.*)$/,'').replace(/\/$/, '')}
           };
 
           chrome.runtime.sendMessage(message, function(response) {
-            var tooltipHtml = '';
             var scores = response.Scores;
-            console.log('blahman');
-            console.log(scores);
-            console.log(scores.length);
-            for ( var i=0; i<scores.length; i++ ) {
-              tooltipHtml += '<div>'+scores[i].type+': '+scores[i].value+'</div>';
-            }
-            $('.clickshame-tooltip').html(tooltipHtml);
+            var comments = response.Comments;
+
+            $('.clickshame-tooltip')
+            .html(clickshameTooltip(scores, comments))
+            .css('top', (pageX - 100) + 'px');
           });
         });
 
@@ -133,12 +140,12 @@ window.onload = function(){
 
   function submitCurrentReferences(tabInfo) {
     return new PromiseA(function(){
-      getCurrentReferences().then(function(urls){
+      getCurrentReferences().then(function(hashes){
         var message = {
           func: 'sendRequest',
-          method: 'GET',
-          path: '/references',
-          data: {key: tabInfo.identityKey, urls: urls}
+          method: 'POST',
+          path: '/references/find',
+          data: {key: tabInfo.identityKey, hashes: hashes}
         };
 
         chrome.runtime.sendMessage(message, function(response) {

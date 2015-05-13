@@ -4,7 +4,8 @@
   var PromiseA = window.Promise;
 
   function baseUrl() {
-    return PromiseA.resolve('http://localhost:3000');
+    return PromiseA.resolve('http://api.clickshame.com');
+    // return PromiseA.resolve('http://localhost:3000');
   }
 
   function payloadToQueryString(data) {
@@ -16,7 +17,7 @@
           if ( Array.isArray(data[i]) ) {
             for ( var j=0; j<data[i].length; j++ ){
               // parts.push(encodeURIComponent(i) + '['+j+']=' + encodeURIComponent(data[i][j]));
-              parts.push(encodeURIComponent(i) + '[]=' + encodeURIComponent(data[i][j]));
+              parts.push(encodeURIComponent(i) + '=' + encodeURIComponent(data[i][j]));
             }
           } else {
             parts.push(encodeURIComponent(i) + '=' + encodeURIComponent(data[i]));
