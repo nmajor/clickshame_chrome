@@ -16,8 +16,26 @@ window.onload = function(){
     return a;
   };
 
+  // $.longUrl( "http://url.ie/4qns", function(result){  });
+
+  function getParameterByName(href, name) {
+    name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+    var regex = new RegExp('[\\?&]' + name + '=([^&#]*)'),
+        results = regex.exec(href);
+    return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+  }
+
+  function skipLink(href) {
+    if ( !href ||
+      href === '' ||
+      href.indexOf( 'www.facebook.com' ) > -1
+    ) { return true; } else { return false; }
+  }
+
   function fullUrlFromHref( href ) {
-    if ( href.indexOf( '://' ) > -1 ) {
+    if ( window.location.hostname === 'www.facebook.com' ) {
+      return getParameterByName(href, 'u').replace(/^[A-Za-z]{1,15}:\/\/[w]{0,3}\.?/, '').replace(/[#?](.*)$/,'').replace(/\/$/, '');
+    } else if ( href.indexOf( '://' ) > -1 ) {
       return href.replace(/^[A-Za-z]{1,15}:\/\/[w]{0,3}\.?/, '').replace(/[#?](.*)$/,'').replace(/\/$/, '');
     } else {
       return (document.domain+href).replace(/^[A-Za-z]{1,15}:\/\/[w]{0,3}\.?/, '').replace(/[#?](.*)$/,'').replace(/\/$/, '');
@@ -26,31 +44,18 @@ window.onload = function(){
 
   function getUrlHashesFromLinks(links) {
     var CryptoJS = window.CryptoJS;
+    var link;
     return new PromiseA(function(resolve){
       var hashes = [];
       for(var i=0; i<links.length; i++) {
-        if ( links[i].href === '' ) { continue; }
-        hashes.push( CryptoJS.MD5(fullUrlFromHref(links[i].href)).toString() );
+        link = fullUrlFromHref( $(links[i]).prop('href'));
+        if ( skipLink( link ) ) { continue; }
+        console.log('blah '+link);
+        hashes.push( CryptoJS.MD5(link) );
       }
       resolve( hashes.getUnique() );
     });
   }
-
-  function getCurrentReferences() {
-    return new PromiseA(function(resolve){
-      var links = document.getElementsByTagName('a');
-      getUrlHashesFromLinks(links).then(function(hashes){
-        resolve( hashes );
-      });
-    });
-  }
-
-  // function clickshameLoadingHtml() {
-  //   return '<div class="clickshame-spinner" id="strike-spinner">'+
-  //     '<div class="clickshame-double-bounce1"></div>'+
-  //     '<div class="clickshame-double-bounce2"></div>'+
-  //     '</div>';
-  // }
 
   function clickshameTooltip(scores, comments) {
     var html = '';
@@ -91,7 +96,7 @@ window.onload = function(){
             func: 'sendRequest',
             method: 'GET',
             path: '/references/find',
-            data: {key: tabInfo.identityKey, url: elm.href.replace(/^[A-Za-z]{1,15}:\/\/[w]{0,3}\.?/, '').replace(/[#?](.*)$/,'').replace(/\/$/, '')}
+            data: {key: tabInfo.identityKey, url: $(elm).prop('href').replace(/^[A-Za-z]{1,15}:\/\/[w]{0,3}\.?/, '').replace(/[#?](.*)$/,'').replace(/\/$/, '')}
           };
 
           chrome.runtime.sendMessage(message, function(response) {
@@ -114,7 +119,7 @@ window.onload = function(){
 
   function paintElement(elm) {
     return new PromiseA(function(){
-      elm.className = elm.className + ' clickshame';
+      $(elm).addClass( 'clickshame' );
       bindTooltip(elm);
     });
   }
@@ -125,12 +130,13 @@ window.onload = function(){
     });
   }
 
-  function paintElements(referenceUrlArray) {
+  function paintElements(referenceUrlArray, links) {
     return new PromiseA(function(){
-      var links = document.getElementsByTagName('a');
+      // var links = document.getElementsByTagName('a');
       var linkUrl;
       for ( var i=0; i<links.length; i++ ) {
-        linkUrl = links[i].href.replace(/^[A-Za-z]{1,15}:\/\/[w]{0,3}\.?/, '').replace(/[#?](.*)$/,'').replace(/\/$/, '');
+        if ( referenceUrlArray.length > 0 ) { console.log('clickshame '+referenceUrlArray); }
+        linkUrl = fullUrlFromHref( $( links[i] ).prop('href') ).replace(/^[A-Za-z]{1,15}:\/\/[w]{0,3}\.?/, '').replace(/[#?](.*)$/,'').replace(/\/$/, '');
         if ( referenceUrlArray.indexOf(linkUrl) > -1 ) {
           paintElement(links[i]);
         }
@@ -138,19 +144,32 @@ window.onload = function(){
     });
   }
 
-  function submitCurrentReferences(tabInfo) {
-    return new PromiseA(function(){
-      getCurrentReferences().then(function(hashes){
-        var message = {
-          func: 'sendRequest',
-          method: 'POST',
-          path: '/references/find',
-          data: {key: tabInfo.identityKey, hashes: hashes}
-        };
+  function submitLinks(tabInfo, links){
+    return getUrlHashesFromLinks(links).then(function(hashes){
+      if (hashes.length < 1) { return; }
+      var message = {
+        func: 'sendRequest',
+        method: 'POST',
+        path: '/references/find',
+        data: {key: tabInfo.identityKey, hashes: hashes}
+      };
 
-        chrome.runtime.sendMessage(message, function(response) {
-          getUrlArrayFromResponse(response).then(function(referenceUrlArray) { paintElements(referenceUrlArray); });
-        });
+      chrome.runtime.sendMessage(message, function(response) {
+        getUrlArrayFromResponse(response).then(function(referenceUrlArray) { paintElements(referenceUrlArray, links); });
+      });
+    });
+  }
+
+  function getCurrentLinks() {
+    return new PromiseA(function(resolve){
+      resolve( document.getElementsByTagName('a') );
+    });
+  }
+
+  function submitCurrentLinks(tabInfo) {
+    return new PromiseA(function(resolve){
+      getCurrentLinks().then(function(links) {
+        resolve( submitLinks(tabInfo, links) );
       });
     });
   }
@@ -164,9 +183,34 @@ window.onload = function(){
   chrome.runtime.sendMessage({func: 'getTabInfo'}, function(tabInfo) {
     isDisabled(tabInfo).then(function(val){
       if ( !val ) {
-        submitCurrentReferences(tabInfo);
+        submitCurrentLinks(tabInfo);
       }
     });
   });
+
+  var observer = new MutationObserver(function (mutations) {
+    var newLinks = [];
+    mutations.forEach(function (mutation, index, array) {
+      $(mutation.addedNodes).find('a').each(function() {
+        newLinks.push( $(this) );
+      });
+      if ( (index+1) === array.length && newLinks.length > 0 ) {
+        chrome.runtime.sendMessage({func: 'getTabInfo'}, function(tabInfo) {
+          isDisabled(tabInfo).then(function(val){
+            if ( !val ) {
+              submitLinks(tabInfo, newLinks);
+            }
+          });
+        });
+      }
+    });
+  });
+  var body = document.querySelector('body');
+  var options = {
+    subtree: true,
+    childList: true,
+    attributes: false
+  };
+  observer.observe(body, options);
 
 };
