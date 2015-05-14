@@ -51,7 +51,7 @@ window.onload = function(){
         link = fullUrlFromHref( $(links[i]).prop('href'));
         if ( skipLink( link ) ) { continue; }
         console.log('blah '+link);
-        hashes.push( CryptoJS.MD5(link) );
+        hashes.push( CryptoJS.MD5(link).toString() );
       }
       resolve( hashes.getUnique() );
     });
@@ -153,6 +153,8 @@ window.onload = function(){
         path: '/references/find',
         data: {key: tabInfo.identityKey, hashes: hashes}
       };
+      console.log('blahdata '+message.data.hashes);
+
 
       chrome.runtime.sendMessage(message, function(response) {
         getUrlArrayFromResponse(response).then(function(referenceUrlArray) { paintElements(referenceUrlArray, links); });
