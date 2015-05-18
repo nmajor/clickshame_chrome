@@ -58,18 +58,31 @@ window.onload = function(){
   }
 
   function clickshameTooltip(scores, comments) {
+    var compositeScore = scores.filter(function(score){ return score.type === 'composite'; })[0];
+    console.log('blah1 '+compositeScore.value);
     var html = '';
+
     html += '<div class="clickshame-scores">';
-    for ( var i=0; i<scores.length; i++ ) {
-      html += '<div class="clickshame-score '+scores[i].type+'">'+scores[i].type+': '+scores[i].value+'</div>';
-    }
+    html +=   '<div class="clickshame-score">';
+    html +=     '<div class="clickshame-score-header">Clickshame Score</div>';
+    html +=     '<div class="clickshame-score-value">'+compositeScore.value+'</div>';
+    html +=   '</div>';
     html += '</div>';
+    html += '<div class="clickshame-comments">';
+    html +=   '<div class="clickshame-comments-header">Recent Comments:</div>';
+
+    console.log('blahblah2 '+ comments[0]);
     if ( comments.length > 0 ) {
-      html += '<div class="clickshame-comments">';
       for ( var j=0; j<comments.length; j++ ) {
         html += '<div class="clickshame-comment">'+comments[j].text+'</div>';
       }
+    } else {
+      html += '<div class="clickshame-comment">No recent comments.</div>';
     }
+
+    html += '</div>';
+
+    console.log('blah1 '+html);
     return html;
   }
 
