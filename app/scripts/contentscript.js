@@ -3,6 +3,7 @@ window.onload = function(){
   'use strict';
   var $ = window.jQuery;
   var PromiseA = window.Promise;
+  var urlShorteners = window.urlShorteners;
 
   Array.prototype.getUnique = function(){
     var u = {}, a = [];
@@ -15,8 +16,6 @@ window.onload = function(){
     }
     return a;
   };
-
-  // $.longUrl( "http://url.ie/4qns", function(result){  });
 
   function getParameterByName(href, name) {
     name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
@@ -34,28 +33,82 @@ window.onload = function(){
 
   function fullUrlFromHref( href ) {
     if ( window.location.hostname === 'www.facebook.com' ) {
-      return getParameterByName(href, 'u').replace(/^[A-Za-z]{1,15}:\/\/[w]{0,3}\.?/, '').replace(/[#?](.*)$/,'').replace(/\/$/, '');
+      return getParameterByName(href, 'u');
     } else if ( href.indexOf( '://' ) > -1 ) {
-      return href.replace(/^[A-Za-z]{1,15}:\/\/[w]{0,3}\.?/, '').replace(/[#?](.*)$/,'').replace(/\/$/, '');
+      return href;
     } else {
-      return (document.domain+href).replace(/^[A-Za-z]{1,15}:\/\/[w]{0,3}\.?/, '').replace(/[#?](.*)$/,'').replace(/\/$/, '');
+      return document.domain+href;
     }
+  }
+
+  function urlFromLinks(links) {
+    return new PromiseA(function(resolve){
+      var linkUrls = [];
+      var url;
+
+      for(var i=0; i<links.length; i++) {
+        url = fullUrlFromHref( $(links[i]).prop('href'));
+        if ( skipLink( url ) ) { continue; }
+        linkUrls.push( url );
+      }
+      resolve(linkUrls);
+    });
+  }
+
+  function resolveUrl(url) {
+    return new PromiseA(function(resolve){
+      var domain = $('<a>').prop('href', url).prop('hostname');
+      if ( $.inArray(domain, urlShorteners) > -1 ) {
+        $.longUrl( url, function(result){
+
+          // EXPAND URL
+
+          resolve( result[url] );
+        });
+      } else { resolve(url); }
+    });
   }
 
   function getUrlHashesFromLinks(links) {
     var CryptoJS = window.CryptoJS;
-    var link;
     return new PromiseA(function(resolve){
       var hashes = [];
-      for(var i=0; i<links.length; i++) {
-        link = fullUrlFromHref( $(links[i]).prop('href'));
-        if ( skipLink( link ) ) { continue; }
-        console.log('blah '+link);
-        hashes.push( CryptoJS.MD5(link).toString() );
-      }
-      resolve( hashes.getUnique() );
+
+      urlFromLinks(links).map(resolveUrl)
+      .then(function(fullLinkUrls) {
+        for(var j=0; j<fullLinkUrls.length; j++) {
+          hashes.push( CryptoJS.MD5( fullLinkUrls[j].replace(/^[A-Za-z]{1,15}:\/\/[w]{0,3}\.?/, '').replace(/[#?](.*)$/,'').replace(/\/$/, '') ).toString() );
+        }
+      })
+      .then(function() {
+        resolve( hashes.getUnique() );
+      });
     });
   }
+
+  // function fullUrlFromHref( href ) {
+  //   if ( window.location.hostname === 'www.facebook.com' ) {
+  //     return getParameterByName(href, 'u').replace(/^[A-Za-z]{1,15}:\/\/[w]{0,3}\.?/, '').replace(/[#?](.*)$/,'').replace(/\/$/, '');
+  //   } else if ( href.indexOf( '://' ) > -1 ) {
+  //     return href.replace(/^[A-Za-z]{1,15}:\/\/[w]{0,3}\.?/, '').replace(/[#?](.*)$/,'').replace(/\/$/, '');
+  //   } else {
+  //     return (document.domain+href).replace(/^[A-Za-z]{1,15}:\/\/[w]{0,3}\.?/, '').replace(/[#?](.*)$/,'').replace(/\/$/, '');
+  //   }
+  // }
+
+  // function getUrlHashesFromLinks(links) {
+  //   var CryptoJS = window.CryptoJS;
+  //   var link;
+  //   return new PromiseA(function(resolve){
+  //     var hashes = [];
+  //     for(var i=0; i<links.length; i++) {
+  //       link = fullUrlFromHref( $(links[i]).prop('href'));
+  //       if ( skipLink( link ) ) { continue; }
+  //       hashes.push( CryptoJS.MD5(link).toString() );
+  //     }
+  //     resolve( hashes.getUnique() );
+  //   });
+  // }
 
   function clickshameTooltip(scores, comments) {
     var compositeScore = scores.filter(function(score){ return score.type === 'composite'; })[0];
@@ -148,7 +201,6 @@ window.onload = function(){
       // var links = document.getElementsByTagName('a');
       var linkUrl;
       for ( var i=0; i<links.length; i++ ) {
-        if ( referenceUrlArray.length > 0 ) { console.log('clickshame '+referenceUrlArray); }
         linkUrl = fullUrlFromHref( $( links[i] ).prop('href') ).replace(/^[A-Za-z]{1,15}:\/\/[w]{0,3}\.?/, '').replace(/[#?](.*)$/,'').replace(/\/$/, '');
         if ( referenceUrlArray.indexOf(linkUrl) > -1 ) {
           paintElement(links[i]);

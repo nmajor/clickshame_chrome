@@ -112,6 +112,7 @@ module.exports = function (grunt) {
         ignores: [
           'app/scripts/jquery-2.1.3.min.js',
           'app/scripts/jquery.longurl.min.js',
+          'app/scripts/bluebird.min.js',
           'app/scripts/md5.js',
         ]
       },

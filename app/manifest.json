@@ -31,7 +31,9 @@
             "js": [
                 "scripts/jquery-2.1.3.min.js",
                 "scripts/jquery.longurl.min.js",
+                "scripts/bluebird.min.js",
                 "scripts/md5.js",
+                "scripts/shorteners.js",
                 "scripts/contentscript.js"
             ],
             "run_at": "document_end",
