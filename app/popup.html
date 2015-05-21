@@ -39,9 +39,12 @@
             </div>
 
             <div id="strike-fields">
-              </label>140 Character Limit..</label>
-              <textarea class="no-outline" id="strike-comment" placeholder="Type a spoiler, save a click." maxlength="140"></textarea>
-              <div class="inline-checkbox">
+              <div class="control">
+                <label for="strike-comment">Add a spoiler, save a click.</label>
+                <textarea class="no-outline" id="strike-comment" placeholder="140 Character Limit..." maxlength="140"></textarea>
+              </div>
+
+              <!-- <div class="inline-checkbox">
                 <input class="no-outline" type="radio" id="strike-type" name="strike-type" value="misleading_title" checked>
                 <label>Misleading Title</label>
               </div>
@@ -52,8 +55,10 @@
               <div class="inline-checkbox">
                 <input class="no-outline" type="radio" id="strike-type" name="strike-type" value="emotionally_manipulative">
                 <label>Emotionally Manipulative</label>
-              </div>
-              <input class="no-outline strike-button" type="button" id="strike-submit" value="Report This Page">
+              </div> -->
+
+              <input class="no-outline" type="hidden" id="strike-type" name="strike-type" value="clickbait">
+              <input class="no-outline strike-button" type="button" id="strike-submit" value="This Page is Clickbait!">
             </div>
           </div>
         </div>

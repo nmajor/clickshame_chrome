@@ -59,7 +59,6 @@ window.onload = function(){
 
   function clickshameTooltip(scores, comments) {
     var compositeScore = scores.filter(function(score){ return score.type === 'composite'; })[0];
-    console.log('blah1 '+compositeScore.value);
     var html = '';
 
     html += '<div class="clickshame-scores">';
@@ -71,7 +70,6 @@ window.onload = function(){
     html += '<div class="clickshame-comments">';
     html +=   '<div class="clickshame-comments-header">Recent Comments:</div>';
 
-    console.log('blahblah2 '+ comments[0]);
     if ( comments.length > 0 ) {
       for ( var j=0; j<comments.length; j++ ) {
         html += '<div class="clickshame-comment">'+comments[j].text+'</div>';
@@ -82,7 +80,6 @@ window.onload = function(){
 
     html += '</div>';
 
-    console.log('blah1 '+html);
     return html;
   }
 
@@ -91,6 +88,7 @@ window.onload = function(){
 
       var pageX = Math.floor( $(elm).offset().top );
       var pageY = Math.floor( $(elm).offset().left );
+      var tooltipX;
 
       $(elm).hover(function(){ // Hover event
 
@@ -117,8 +115,10 @@ window.onload = function(){
             var comments = response.Comments;
 
             $('.clickshame-tooltip')
-            .html(clickshameTooltip(scores, comments))
-            .css('top', (pageX - 100) + 'px');
+            .html(clickshameTooltip(scores, comments));
+
+            tooltipX = $('.clickshame-tooltip').height();
+            $('.clickshame-tooltip').css('top', (pageX - tooltipX - 22) + 'px');
           });
         });
 
@@ -166,8 +166,6 @@ window.onload = function(){
         path: '/references/find',
         data: {key: tabInfo.identityKey, hashes: hashes}
       };
-      console.log('blahdata '+message.data.hashes);
-
 
       chrome.runtime.sendMessage(message, function(response) {
         getUrlArrayFromResponse(response).then(function(referenceUrlArray) { paintElements(referenceUrlArray, links); });

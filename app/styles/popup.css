@@ -1,10 +1,11 @@
 .wrapper { width: 184px; }
+.control { margin: .8em 0; }
 .option-link {
-  color: blue;
+  color: rgb(45, 64, 253);
   display: none;
 }
-.option-link:hover { cursor: pointer; }
-#strike-comment { width: 97%; }
+.option-link:hover { cursor: pointer; color: rgb(36, 51, 207); }
+#strike-comment { width: 97%; margin-top: .5em; }
 .strike-button {
   width: 100%;
   -webkit-border-radius: 3;
@@ -13,14 +14,14 @@
   font-family: Arial;
   color: #ffffff;
   font-size: 15px;
-  background: #3498db;
+  background: #ff1a1a;
   padding: 4px 20px;
   text-decoration: none;
   border: none;
   outline: 0;
 }
 .strike-button:hover {
-  background: #3cb0fd;
+  background: #DD1717;
   text-decoration: none;
 }
 .inline-checkbox { margin: 5px 0; }
