@@ -55,19 +55,17 @@ window.onload = function(){
     });
   }
 
-  function resolveUrl(url) {
-    return new PromiseA(function(resolve){
-      var domain = $('<a>').prop('href', url).prop('hostname');
-      if ( $.inArray(domain, urlShorteners) > -1 ) {
-        $.longUrl( url, function(result){
+  // function resolveUrl(url) {
+  //   return new PromiseA(function(resolve){
+  //     var domain = $('<a>').prop('href', url).prop('hostname');
+  //     if ( $.inArray(domain, urlShorteners) > -1 ) {
+  //         console.log('blahblahresolveurl1');
+  //         console.log(result);
 
-          // EXPAND URL
-
-          resolve( result[url] );
-        });
-      } else { resolve(url); }
-    });
-  }
+  //         resolve( result[url] );
+  //     } else { resolve(url); }
+  //   });
+  // }
 
   function getUrlHashesFromLinks(links) {
     var CryptoJS = window.CryptoJS;
@@ -85,30 +83,6 @@ window.onload = function(){
       });
     });
   }
-
-  // function fullUrlFromHref( href ) {
-  //   if ( window.location.hostname === 'www.facebook.com' ) {
-  //     return getParameterByName(href, 'u').replace(/^[A-Za-z]{1,15}:\/\/[w]{0,3}\.?/, '').replace(/[#?](.*)$/,'').replace(/\/$/, '');
-  //   } else if ( href.indexOf( '://' ) > -1 ) {
-  //     return href.replace(/^[A-Za-z]{1,15}:\/\/[w]{0,3}\.?/, '').replace(/[#?](.*)$/,'').replace(/\/$/, '');
-  //   } else {
-  //     return (document.domain+href).replace(/^[A-Za-z]{1,15}:\/\/[w]{0,3}\.?/, '').replace(/[#?](.*)$/,'').replace(/\/$/, '');
-  //   }
-  // }
-
-  // function getUrlHashesFromLinks(links) {
-  //   var CryptoJS = window.CryptoJS;
-  //   var link;
-  //   return new PromiseA(function(resolve){
-  //     var hashes = [];
-  //     for(var i=0; i<links.length; i++) {
-  //       link = fullUrlFromHref( $(links[i]).prop('href'));
-  //       if ( skipLink( link ) ) { continue; }
-  //       hashes.push( CryptoJS.MD5(link).toString() );
-  //     }
-  //     resolve( hashes.getUnique() );
-  //   });
-  // }
 
   function clickshameTooltip(scores, comments) {
     var compositeScore = scores.filter(function(score){ return score.type === 'composite'; })[0];

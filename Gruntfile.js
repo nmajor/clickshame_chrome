@@ -110,7 +110,7 @@ module.exports = function (grunt) {
         jshintrc: '.jshintrc',
         reporter: require('jshint-stylish'),
         ignores: [
-          'app/scripts/jquery-2.1.3.min.js',
+          'app/scripts/jquery-1.11.3.min.js',
           'app/scripts/jquery.longurl.min.js',
           'app/scripts/bluebird.min.js',
           'app/scripts/md5.js',
