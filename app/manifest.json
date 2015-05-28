@@ -30,7 +30,6 @@
             ],
             "js": [
                 "scripts/jquery-1.11.3.min.js",
-                "scripts/jquery.longurl.min.js",
                 "scripts/bluebird.min.js",
                 "scripts/md5.js",
                 "scripts/shorteners.js",

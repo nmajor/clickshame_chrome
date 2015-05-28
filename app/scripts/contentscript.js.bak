@@ -3,6 +3,7 @@ window.onload = function(){
   'use strict';
   var $ = window.jQuery;
   var PromiseA = window.Promise;
+  var urlShorteners = window.urlShorteners;
 
   Array.prototype.getUnique = function(){
     var u = {}, a = [];
@@ -54,18 +55,19 @@ window.onload = function(){
     });
   }
 
-  function getCleanUrlsFromLinks(links) {
+  function getUrlHashesFromLinks(links) {
+    var CryptoJS = window.CryptoJS;
     return new PromiseA(function(resolve){
-      var urls = [];
+      var hashes = [];
 
       urlFromLinks(links)
       .then(function(linkUrls) {
         for(var j=0; j<linkUrls.length; j++) {
-          urls.push( encodeURIComponent( linkUrls[j].replace(/^[A-Za-z]{1,15}:\/\/[w]{0,3}\.?/, '').replace(/[#?](.*)$/,'').replace(/\/$/, '') ) );
+          hashes.push( CryptoJS.MD5( linkUrls[j].replace(/^[A-Za-z]{1,15}:\/\/[w]{0,3}\.?/, '').replace(/[#?](.*)$/,'').replace(/\/$/, '') ).toString() );
         }
       })
       .then(function() {
-        resolve( urls.getUnique() );
+        resolve( hashes.getUnique() );
       });
     });
   }
@@ -170,13 +172,13 @@ window.onload = function(){
   }
 
   function submitLinks(tabInfo, links){
-    return getCleanUrlsFromLinks(links).then(function(urls){
-      if (urls.length < 1) { return; }
+    return getUrlHashesFromLinks(links).then(function(hashes){
+      if (hashes.length < 1) { return; }
       var message = {
         func: 'sendRequest',
         method: 'POST',
         path: '/references/find',
-        data: {key: tabInfo.identityKey, urls: urls}
+        data: {key: tabInfo.identityKey, hashes: hashes}
       };
 
       chrome.runtime.sendMessage(message, function(response) {
