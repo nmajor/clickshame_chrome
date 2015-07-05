@@ -4,6 +4,14 @@
   color: rgb(45, 64, 253);
   display: none;
 }
+.clicksham-links { margin-top: 15px; }
+.clicksham-links a {
+  color: rgb(45, 64, 253);
+}
+.clicksham-links a:hover {
+  text-decoration: none;
+  color: rgb(36, 51, 207);
+}
 .option-link:hover { cursor: pointer; color: rgb(36, 51, 207); }
 #strike-comment { width: 97%; margin-top: .5em; }
 .strike-button {
@@ -25,7 +33,9 @@
   text-decoration: none;
 }
 .inline-checkbox { margin: 5px 0; }
-
+.clickbait-desc {
+  margin-bottom: 15px;
+}
 .spinner {
   display: none;
   width: 40px;

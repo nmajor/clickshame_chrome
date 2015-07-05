@@ -45,6 +45,8 @@
               } else {
                 reject(new Error('Response text not found.'));
               }
+            } else if ( request.readyState === 4 && request.status === 400 ) {
+              if ( JSON.parse(request.responseText).error === 'Invalid identity key.' ) { getNewIdentity(); }
             }
           };
           // request.send(data);
@@ -61,16 +63,20 @@
     });
   }
 
+  function getNewIdentity() {
+    createIdentity().then(function(identity) {
+      var key = identity.key;
+      localStorage.identityKey = key;
+      return key;
+    });
+  }
+
   function getIdentityKey() {
     if ( localStorage.identityKey ) {
       return PromiseA.resolve( localStorage.identityKey );
     }
 
-    return createIdentity().then(function(identity) {
-      var key = identity.key;
-      localStorage.identityKey = key;
-      return key;
-    });
+    return getNewIdentity();
   }
 
   function getTab() {

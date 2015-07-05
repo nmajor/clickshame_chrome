@@ -23,7 +23,10 @@
     padding-top: 5px;
     margin-top: 5px;
 }
-.clickshame-comment { font-size: 12px; }
+.clickshame-comment {
+  font-size: 10px;
+  line-height: 1em;
+}
 
 .clickshame-scores { text-align: center; }
 .clickshame-score-header { font-size: 16px; font-weight: bold; }

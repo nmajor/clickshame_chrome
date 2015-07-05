@@ -101,6 +101,7 @@ window.onload = function(){
 
       var pageX = Math.floor( $(elm).offset().top );
       var pageY = Math.floor( $(elm).offset().left );
+      var elmX = $(elm).height();
       var tooltipX;
 
       $(elm).hover(function(){ // Hover event
@@ -112,7 +113,7 @@ window.onload = function(){
         '</div>')
         .appendTo('body')
         .css('top', (pageX - 50) + 'px')
-        .css('left', (pageY) + 'px')
+        .css('left', (pageY + 3) + 'px')
         .fadeIn('slow');
 
         chrome.runtime.sendMessage({func: 'getTabInfo'}, function(tabInfo) {
@@ -131,7 +132,15 @@ window.onload = function(){
             .html(clickshameTooltip(scores, comments));
 
             tooltipX = $('.clickshame-tooltip').height();
-            $('.clickshame-tooltip').css('top', (pageX - tooltipX - 22) + 'px');
+            var topOffset = pageX - tooltipX - 22;
+            var bottomOffset = pageX + elmX + 2;
+
+            if ( topOffset < 5 ) {
+              $( '.clickshame-tooltip').css('top', bottomOffset + 'px');
+            } else {
+              $('.clickshame-tooltip').css('top', topOffset + 'px');
+            }
+
           });
         });
 

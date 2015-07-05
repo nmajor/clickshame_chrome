@@ -6,7 +6,7 @@
         <!-- bower:css -->
         <!-- endbower -->
         <!-- endbuild -->
-        <!-- build:css styles/main.css -->
+        <!-- build:css styles/popup.css -->
         <link href="styles/popup.css" rel="stylesheet">
         <!-- endbuild -->
         <script src="scripts/jquery-1.11.3.min.js"></script>
@@ -31,7 +31,10 @@
           <div class="strike">
             <div class="strike-header">
               <h2>Report Clickbait</h2>
-              <h3>Do you feel like this page sacrificed quality to get clicks?</h3>
+              <!-- <div class="clickbait-desc">Misleading title or link text?</div>
+              <div class="clickbait-desc">Exaggeration or hyperbole?</div>
+              <div class="clickbait-desc">Rage porn? Emotionally manipulative?</div>
+              <div class="clickbait-desc">Willful withholding of information that could have easily been included in the headline?</div> -->
             </div>
 
             <div class="spinner" id="strike-spinner">
@@ -41,7 +44,7 @@
 
             <div id="strike-fields">
               <div class="control">
-                <label for="strike-comment">Add a spoiler, save a click.</label>
+                <label for="strike-comment">Add a comment. Save a click.</label>
                 <textarea class="no-outline" id="strike-comment" placeholder="140 Character Limit..." maxlength="140"></textarea>
               </div>
 
@@ -60,6 +63,9 @@
 
               <input class="no-outline" type="hidden" id="strike-type" name="strike-type" value="clickbait">
               <input class="no-outline strike-button" type="button" id="strike-submit" value="This Page is Clickbait!">
+
+              <div class="clicksham-links">
+                <a href="http://clickshame.com#contact-wrapper" target="_blank">Contact Clickshame</a>
             </div>
           </div>
         </div>
