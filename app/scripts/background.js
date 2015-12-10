@@ -4,6 +4,7 @@
   var PromiseA = window.Promise;
 
   function baseUrl() {
+    // return PromiseA.resolve('http://api.clickshame.com');
     return PromiseA.resolve('http://api.clickshame.com');
     // return PromiseA.resolve('http://localhost:3000');
   }
